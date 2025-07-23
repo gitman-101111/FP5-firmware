@@ -22,12 +22,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-unzip -d "$tmpdir" "$1" images/BTFM.bin images/dspso.bin images/NON-HLOS.bin images/super.img
+unzip -j -d "$tmpdir" "$1" \*/images/BTFM.bin \*/images/dspso.bin \*/images/NON-HLOS.bin \*/images/super.img
 
 mkdir hexagonfs hexagonfs/dsp hexagonfs/sensors
 
 ### NON-HLOS.bin ###
-sudo mount -o ro "$tmpdir"/images/NON-HLOS.bin "$mount"
+sudo mount -o ro "$tmpdir"/NON-HLOS.bin "$mount"
 cp "$mount"/image/adsp* .
 cp "$mount"/image/battmgr.jsn .
 cp "$mount"/image/cdsp* .
@@ -36,19 +36,19 @@ cp "$mount"/image/wpss* .
 sudo umount "$mount"
 
 ### BTFM.bin ###
-sudo mount -o ro "$tmpdir"/images/BTFM.bin "$mount"
+sudo mount -o ro "$tmpdir"/BTFM.bin "$mount"
 cp "$mount"/image/msbtfw11.mbn .
 cp "$mount"/image/msnv11.bin .
 sudo umount "$mount"
 
 ### dspso.bin ###
-sudo mount -o ro "$tmpdir"/images/dspso.bin "$mount"
+sudo mount -o ro "$tmpdir"/dspso.bin "$mount"
 cp -r "$mount"/*dsp hexagonfs/dsp/
 sudo umount "$mount"
 
 ### super.img ###
-simg2img "$tmpdir"/images/super.img "$tmpdir"/super.raw.img
-rm "$tmpdir"/images/super.img
+simg2img "$tmpdir"/super.img "$tmpdir"/super.raw.img
+rm "$tmpdir"/super.img
 
 loopdev=$(sudo losetup --read-only --find --show "$tmpdir"/super.raw.img)
 sudo dmsetup create --concise "$(sudo parse-android-dynparts "$loopdev")"
